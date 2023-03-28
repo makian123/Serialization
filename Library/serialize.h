@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <type_traits>
+#include <array>
 
 template<typename T>
 std::string Serialize(T obj);
@@ -18,15 +19,14 @@ T Deserialize(const std::string &in);
 #include "generated/deserializeSpecializations.h"
 
 template<typename T>
-concept is_vector = requires(T obj) {
-	std::is_base_of<std::vector<typename T::value_type, typename T::allocator_type>, T>().value == 1;
-	std::begin(obj);
-	std::end(obj);
-	obj.size();
-};
+concept is_std_vector = std::is_base_of_v<T, std::vector<typename T::value_type, typename T::allocator_type>>;
+template<typename T>
+concept is_std_array = std::is_base_of_v<T, std::array<typename T::value_type, sizeof(T) / sizeof(typename T::value_type)>>;
+template<typename T>
+concept is_fundamental = std::is_fundamental_v<T>;
 
 template<class T>
-std::string Serialize(T obj) requires is_vector<T> {
+std::string Serialize(T obj) requires is_std_vector<T> {
 	std::string ret;
 
 	ret.resize(sizeof(size_t));
@@ -44,7 +44,7 @@ std::string Serialize(T obj) requires is_vector<T> {
 	return ret;
 }
 template<class T>
-T Deserialize(const std::string &in) requires is_vector<T> {
+T Deserialize(const std::string &in) requires is_std_vector<T> {
 	T ret;
 	size_t offset = sizeof(size_t);
 	size_t newVecLen;
@@ -61,6 +61,34 @@ T Deserialize(const std::string &in) requires is_vector<T> {
 
 		offset += tmp + sizeof(size_t);
 	}
+	return ret;
+}
+
+template<typename T>
+std::string Serialize(T obj) requires is_std_array<T> {
+	std::string ret;
+
+	ret.resize(sizeof(size_t));
+	size_t arrSize = obj.size();
+	memcpy(ret.data(), &arrSize, sizeof(size_t));
+
+	for (auto &item : obj) {
+		ret += Serialize<typename T::value_type>(item);
+	}
+	
+	size_t retLen = ret.length();
+	ret.insert(0, sizeof(size_t), '\0');
+	memcpy(ret.data(), &retLen, sizeof(size_t));
+
+	return ret;
+}
+template<typename T>
+T Deserialize(const std::string &in) requires is_std_array<T> {
+	std::array<typename T::value_type, T::size_type> ret;
+
+	size_t offset = sizeof(size_t);
+
+
 	return ret;
 }
 

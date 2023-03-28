@@ -9,8 +9,14 @@
 
 #include "Library/serialize.h"
 
+#include <array>
+
 int main(int argv, char *argc[]) {
-	if (argv < 4) {
+	std::array<char, 5> vec = { 1, 2, 3, 4, 5 };
+
+	std::string serialized = Serialize<std::array<char, 5>>(vec);
+
+	/*if (argv < 4) {
 		std::cout << "Correct syntax: -I \"library_header_path\"/ \"<files>\"";
 		return 1;
 	}
@@ -36,7 +42,7 @@ int main(int argv, char *argc[]) {
 	for (size_t i = 0; i < files.size(); ++i) {
 		serializer.SerializeFile(files[i]);
 	}
-	serializer.End();
+	serializer.End();*/
 
 	return 0;
 }
