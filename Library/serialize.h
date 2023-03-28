@@ -84,10 +84,21 @@ std::string Serialize(T obj) requires is_std_array<T> {
 }
 template<typename T>
 T Deserialize(const std::string &in) requires is_std_array<T> {
-	std::array<typename T::value_type, T::size_type> ret;
+	T ret;
 
 	size_t offset = sizeof(size_t);
 
+	size_t len;
+	memcpy(&len, in.data() + offset, sizeof(size_t));
+	offset += sizeof(size_t);
+
+	size_t tmp;
+	for (size_t i = 0; i < len; ++i) {
+		ret[i] = Deserialize<typename T::value_type>(in.substr(offset));
+
+		memcpy(&tmp, in.data() + offset, sizeof(size_t));
+		offset += tmp + sizeof(size_t);
+	}
 
 	return ret;
 }
