@@ -1,17 +1,17 @@
 #pragma once
 
-#include <string>
-#include <vector>
-
-struct Point {
-	float x;
-	float y;
+class Base1Class {
+	public:
+	int varBase = 1;
+};
+class Base2Class {
+	public:
+	int varBase2 = 2;
 };
 
-class PointStruct {
+class DerivedClass: public Base1Class, public Base2Class {
+	private:
+	int privVar = 3;
 	public:
-	std::string name;
-	Point point;
-	std::string name2;
-	std::vector<int> vec;
+	int varDerived = 4;
 };

@@ -7,10 +7,6 @@
 
 #include "Library/parser.h"
 
-#include "Library/serialize.h"
-
-#include <array>
-
 int main(int argv, char *argc[]) {
 	if(argv < 4) {
 		std::cout << "Correct syntax: -I \"library_header_path\"/ \"<files>\"";

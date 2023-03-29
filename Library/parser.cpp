@@ -148,6 +148,7 @@ CXChildVisitResult Parser::ParseClass(CXCursor c, CXCursor parent) {
 	if (cursorKind == CXCursor_ClassDecl || cursorKind == CXCursor_StructDecl) {
 		className = CXStringToString(clang_getCursorSpelling(c));
 
+		std::cout << "Class: " << className << std::endl;
 
 		if (!generatedSerializerSource.is_open())
 			return CXChildVisit_Break;
@@ -188,13 +189,22 @@ CXChildVisitResult Parser::ParseFields(CXCursor c, CXCursor parent) {
 		if (!generatedSerializerSource.is_open())
 			return CXChildVisit_Break;
 
+		if (clang_getCXXAccessSpecifier(c) != CX_CXXAccessSpecifier::CX_CXXPublic)
+			return CXChildVisit_Continue;
+
 		generatedSerializerSource << "\tret += Serialize<" << typeName << ">(obj." << fieldName << ");\n";
 
-		//TODO;
 		generatedDeserializerSource <<
 			"\tret." << fieldName << " = Deserialize<" << typeName << ">(in.substr(offset));\n" <<
 			"\tmemcpy(&temp, (in.data() + offset), sizeof(size_t));\n" <<
 			"\toffset += temp + sizeof(size_t);\n\n";
+	}
+	else if (cursorKind == CXCursor_CXXBaseSpecifier) {
+		CXCursor cursor2 = clang_getCursorDefinition(c);
+		
+		clang_visitChildren(cursor2, &Parser::VisitorFields, this);
+
+		return CXChildVisit_Continue;
 	}
 	else {
 		return CXChildVisit_Continue;

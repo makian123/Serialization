@@ -24,10 +24,10 @@
     <ClInclude Include="Library\serialize.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\generated\deserializeSpecializations.h">
+    <ClInclude Include="Library\generated\serializeSpecializations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Library\generated\serializeSpecializations.h">
+    <ClInclude Include="Library\generated\deserializeSpecializations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
